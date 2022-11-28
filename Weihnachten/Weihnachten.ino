@@ -1,5 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 #include "Letter.h"
+#include "Symbols.h"
 #ifdef __AVR__
 #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
 #endif
@@ -31,21 +32,24 @@ void setup() {
   pixels.clear();
   bright();
   pixels.show();
+  fillSnowFall();
+  clearSnowLand();
 }
 
 int8_t start_x = 30;
 int8_t start_y = 6;
 void loop() {
   
-  printWeihnachten();
+  printSnowfall();
+/*  printWeihnachten();
     pixels.clear();
   printKerze(0);
-/*  printKerze(8);
+  printKerze(8);
   printKerze(16);
-  printKerze(24);*/
+  printKerze(24);
   for (int8_t i = 0; i < 7; ++i) {
     printKerzeFlackern(0);
-  }
+  }*/
 /*  for (uint8_t i = 0; i < 10; ++i) {
     int8_t x1 = random(-15, 15);
     int8_t x2 = random(-15, 15);
@@ -97,6 +101,81 @@ void printKerze(const int8_t x_pos) {
   drawPixel(x_pos + 2, 18, red, green, blue);*/
   bright();
   pixels.show();
+}
+
+void printSnowfall() {
+  for (uint8_t i = 0; i < 10; ++i) {
+    pixels.clear();
+    printSnowLand();
+    printSnowfallInternal();
+    bright();
+    pixels.show();
+    delay(150);
+  }
+}
+
+void printSnowfallInternal() {
+	for (uint8_t i = 0; i < AMOUNT_SNOWFLAKES - 1; i += 2) {
+    if (snow_fall[i + 1] == 0) {
+      snow_fall[i] = random(40);
+		  snow_fall[i + 1] = random(20, 40);
+    }
+		snow_fall[i] = random(4) == 3 ? snow_fall[i] + 1 : snow_fall[i] - 1;
+		snow_fall[i + 1] -= 1;
+		drawPixel(snow_fall[i], snow_fall[i + 1], 150, 150, 150);
+	}
+}
+
+void printSnowfallStayInternal() {
+	for (uint8_t i = 0; i < AMOUNT_SNOWFLAKES - 1; i += 2) {
+    if (snow_fall[i + 1] == 0) {
+      snow_fall[i] = random(40);
+		  snow_fall[i + 1] = random(20, 40);
+    }
+    int8_t new_x = random(4) == 3 ? snow_fall[i] + 1 : snow_fall[i] - 1;
+    int8_t new_y = snow_fall[i + 1] - 1;
+
+    uint8_t value = getSnowLand(new_x, new_y);
+    if (value > 0 || new_y == 0) {
+      setSnowLand(new_x, new_y, value + 1);
+    }
+    if (value + 1 < 2) {
+      snow_fall[i] = new_x;
+		  snow_fall[i + 1] = new_y;
+		  drawPixel(snow_fall[i], snow_fall[i + 1], 150, 150, 150);
+    }
+	}
+}
+
+uint8_t getSnowLand(const int8_t x, const int8_t y) {
+  if (x >= size_x || y >= size_y || x < 0 || y < 0)
+    return 0;
+  int8_t pos_x;
+  if (startLeft) {
+    pos_x = y % 2 == 0 ? x : size_x - 1 - x;
+  } else {
+    pos_x = y % 2 == 1 ? x : size_x - 1 - x;
+  }
+  return snow_land[pos_x + size_x * y];
+}
+
+void setSnowLand(const int8_t x, const int8_t y, int8_t value) {
+  if (x >= size_x || y >= size_y || x < 0 || y < 0)
+    return;
+  int8_t pos_x;
+  if (startLeft) {
+    pos_x = y % 2 == 0 ? x : size_x - 1 - x;
+  } else {
+    pos_x = y % 2 == 1 ? x : size_x - 1 - x;
+  }
+  snow_land[pos_x + size_x * y] = value;
+}
+
+void printSnowLand() {
+  for (uint16_t i = 0; i < 600 - 1; i += 2) {
+		if (snow_land[i] >= 5)
+      pixels.setPixelColor(i, pixels.Color(150, 150, 150));
+	}
 }
 
 void printKerzeFlackern(const int8_t x_pos) {
