@@ -2,7 +2,7 @@
 
 int8_t snow_fall[AMOUNT_SNOWFLAKES];
 
-int16_t snow_land[600];
+uint8_t snow_land[600];
 
 void fillSnowFall() {
 	for (uint8_t i = 0; i < AMOUNT_SNOWFLAKES - 1; i += 2) {
