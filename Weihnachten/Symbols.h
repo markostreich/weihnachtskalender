@@ -1,3 +1,4 @@
+#include "HardwareSerial.h"
 #include "Graphics.h"
 
 #define AMOUNT_SNOWFLAKES 50
@@ -9,16 +10,16 @@ int8_t snow_fall[AMOUNT_SNOWFLAKES];
 uint8_t snow_land[NUMPIXELS];
 
 void fillSnowFall() {
-	for (uint8_t i = 0; i < AMOUNT_SNOWFLAKES - 1; i += 2) {
-		snow_fall[i] = random(size_x + 20);
-		snow_fall[i + 1] = random(size_y, size_y + 20);
-	}
+  for (uint8_t i = 0; i < AMOUNT_SNOWFLAKES - 1; i += 2) {
+    snow_fall[i] = random(size_x + 20);
+    snow_fall[i + 1] = random(size_y, size_y + 20);
+  }
 }
 
 void clearSnowLand() {
-	for (uint16_t i = 0; i < NUMPIXELS; ++i) {
-		snow_land[i] = 0;
-	}
+  for (uint16_t i = 0; i < NUMPIXELS; ++i) {
+    snow_land[i] = 0;
+  }
 }
 
 uint8_t getSnowLand(const int8_t x, const int8_t y) {
@@ -46,13 +47,321 @@ void setSnowLand(const int8_t x, const int8_t y, int8_t value) {
 }
 
 void printSnowLand() {
+  uint8_t amount_top = 0;
   for (uint16_t i = 0; i < NUMPIXELS; ++i) {
-		if (snow_land[i] >= SNOW_BORDER) {
-			pixels.setPixelColor(i, pixels.Color(150, 150, 150));
-			if (i > NUMPIXELS - size_x)
-				clearSnowLand();
-		}
-	}
+    if (snow_land[i] >= SNOW_BORDER) {
+      pixels.setPixelColor(i, pixels.Color(150, 150, 150));
+      if (i > NUMPIXELS - size_x && ++amount_top > 10)
+        clearSnowLand();
+    }
+  }
+}
+
+void printSnowfallInternal() {
+  for (uint8_t i = 0; i < AMOUNT_SNOWFLAKES - 1; i += 2) {
+    if (snow_fall[i + 1] == 0) {
+      snow_fall[i] = random(40);
+      snow_fall[i + 1] = random(20, 40);
+    }
+    snow_fall[i] = random(4) == 3 ? snow_fall[i] + 1 : snow_fall[i] - 1;
+    snow_fall[i + 1] -= 1;
+    drawPixel(snow_fall[i], snow_fall[i + 1], 70, 70, 250);
+  }
+}
+
+void printSnowfallInternalLast() {
+  for (uint8_t i = 0; i < AMOUNT_SNOWFLAKES - 1; i += 2) {
+    drawPixel(snow_fall[i], snow_fall[i + 1], 70, 70, 250);
+  }
+}
+
+void printSnowflakeInternal(const uint8_t snow_flake[],
+                            const int8_t pos_x, const int8_t pos_y, const uint8_t size_x, const uint8_t size_y,
+                            uint8_t red, uint8_t green, uint8_t blue) {
+  for (uint8_t y = 0; y < size_y; ++y)
+    for (uint8_t x = 0; x < size_x; ++x) {
+      uint8_t color = snow_flake[x + size_x * (size_y - 1 - y)];
+      switch (color) {
+        case 1:
+          drawPixel(pos_x + x, pos_y + y, red, green, blue);
+          break;
+        default:
+          break;
+      }
+    }
+}
+
+struct Snowflake {
+  uint8_t* snow_flake;
+  int8_t pos_x;
+  int8_t pos_y;
+  uint8_t size_x;
+  uint8_t size_y;
+  uint8_t red;
+  uint8_t green;
+  uint8_t blue;
+  uint8_t stateGlow = 0;
+  unsigned long interval = 1000;
+  unsigned long glowInterval = 15;
+  unsigned long lastMillis = 0;
+  unsigned long lastGlowMillis = 0;
+  bool glowing = false;
+  unsigned long moveInterval = 130;
+  unsigned long lastMove = 0;
+};
+
+Snowflake snowflakeBig;
+Snowflake snowflake1;
+Snowflake snowflake2;
+Snowflake snowflake3;
+Snowflake snowflake4;
+Snowflake snowflakeNum3;
+
+void initSnowFlakes() {
+  /* snowflake big */
+  snowflakeBig.snow_flake = snowflakeTiny_2;
+  snowflakeBig.pos_x = random(27);
+  snowflakeBig.pos_y = random(20, 80);
+  snowflakeBig.size_x = 3;
+  snowflakeBig.size_y = 3;
+  snowflakeBig.red = random(40, 70);
+  snowflakeBig.green = random(40, 70);
+  snowflakeBig.blue = random(200, 250);
+  snowflakeBig.interval = random(200, 1000);
+  snowflakeBig.glowInterval = 0;
+  snowflakeBig.moveInterval = random(10, 30);
+
+  /* snowflake tiny 1 */
+  snowflake1.snow_flake = snowflakeTiny_1;
+  snowflake1.pos_x = random(27);
+  snowflake1.pos_y = random(20, 80);
+  snowflake1.size_x = 5;
+  snowflake1.size_y = 5;
+  snowflake1.red = random(40, 70);
+  snowflake1.green = random(40, 70);
+  snowflake1.blue = random(200, 250);
+  snowflake1.interval = random(200, 1000);
+  snowflake1.glowInterval = 15;
+  snowflake1.moveInterval = random(70);
+
+  /* snowflake tiny 2 */
+  snowflake2.snow_flake = snowflakeTiny_2;
+  snowflake2.pos_x = random(27);
+  snowflake2.pos_y = random(20, 80);
+  snowflake2.size_x = 3;
+  snowflake2.size_y = 3;
+  snowflake2.red = random(40, 70);
+  snowflake2.green = random(40, 70);
+  snowflake2.blue = random(200, 250);
+  snowflake2.interval = random(200, 1000);
+  snowflake2.glowInterval = 15;
+  snowflake2.moveInterval = random(70);
+
+  /* snowflake tiny 3 */
+  snowflake3.snow_flake = snowflakeTiny_3;
+  snowflake3.pos_x = random(27);
+  snowflake3.pos_y = random(20, 80);
+  snowflake3.size_x = 3;
+  snowflake3.size_y = 3;
+  snowflake3.red = random(40, 70);
+  snowflake3.green = random(40, 70);
+  snowflake3.blue = random(200, 250);
+  snowflake3.interval = random(200, 1000);
+  snowflake3.glowInterval = 15;
+  snowflake3.moveInterval = random(70);
+
+  /* snowflake tiny 4 */
+  snowflake4.snow_flake = snowflakeTiny_4;
+  snowflake4.pos_x = random(27);
+  snowflake4.pos_y = random(20, 80);
+  snowflake4.size_x = 5;
+  snowflake4.size_y = 5;
+  snowflake4.red = random(40, 70);
+  snowflake4.green = random(40, 70);
+  snowflake4.blue = random(200, 250);
+  snowflake4.interval = random(200, 1000);
+  snowflake4.glowInterval = 15;
+  snowflake4.moveInterval = random(70);
+
+  /* number 3 */
+  snowflakeNum3.snow_flake = snowflake_3;
+  snowflakeNum3.pos_x = random(27);
+  snowflakeNum3.pos_y = random(20, 80);
+  snowflakeNum3.size_x = 4;
+  snowflakeNum3.size_y = 7;
+  snowflakeNum3.red = 100;
+  snowflakeNum3.green = 50;
+  snowflakeNum3.blue = 200;
+  snowflakeNum3.interval = random(200, 1000);
+  snowflakeNum3.glowInterval = 15;
+  snowflakeNum3.moveInterval = random(70);
+}
+
+unsigned long snowfallInterval = 40;
+unsigned long snowfallLast = 0;
+void printSnowflakeInternal(const Snowflake flake) {
+  for (uint8_t y = 0; y < flake.size_y; ++y)
+    for (uint8_t x = 0; x < flake.size_x; ++x) {
+      uint8_t color = flake.snow_flake[x + flake.size_x * (flake.size_y - 1 - y)];
+      switch (color) {
+        case 1:
+          drawPixel(flake.pos_x + x, flake.pos_y + y, flake.red, flake.green, flake.blue);
+          break;
+        default:
+          break;
+      }
+    }
+}
+
+void glowSnowflake(Snowflake flake) {
+  if (flake.stateGlow < flake.size_y) {
+    uint8_t x = flake.size_x;
+    for (uint8_t y = flake.size_y - 1 - flake.stateGlow; y < flake.size_y; ++y) {
+      --x;
+      uint8_t color = flake.snow_flake[x + flake.size_x * (flake.size_y - 1 - y)];
+      switch (color) {
+        case 1:
+          drawPixel(flake.pos_x + x, flake.pos_y + y, flake.red + 150, flake.green + 150, flake.blue);
+          break;
+        default:
+          break;
+      }
+    }
+  } else {
+    uint8_t y = 0;
+    for (int8_t x = flake.size_x + flake.size_y - 1 - flake.stateGlow; x >= 0; --x) {
+
+      uint8_t color = flake.snow_flake[x + flake.size_x * (flake.size_y - 1 - y)];
+      switch (color) {
+        case 1:
+          drawPixel(flake.pos_x + x, flake.pos_y + y, flake.red + 150, flake.green + 150, flake.blue);
+          //Serial.println(color);
+          break;
+        default:
+          //drawPixel(flake.pos_x + x, flake.pos_y + y, flake.red + 50, flake.green + 50, flake.blue);
+          break;
+      }
+      ++y;
+    }
+  }
+}
+
+void printSnowmanInternal(int8_t pos_x, int8_t pos_y) {
+  for (uint8_t y = 0; y < 13; ++y)
+    for (uint8_t x = 0; x < 11; ++x) {
+      uint8_t color = snowman[x + 11 * (12 - y)];
+      switch (color) {
+        case 1:
+          drawPixel(pos_x + x, pos_y + y, 40, 40, 250);
+          break;
+        case 2:
+          drawPixel(pos_x + x, pos_y + y, 40, 40, 250);
+          break;
+        case 3:
+          drawPixel(pos_x + x, pos_y + y, 100, 40, 100);
+          break;
+        case 4:
+          drawPixel(pos_x + x, pos_y + y, 200, 100, 40);
+          break;
+        case 5:
+          drawPixel(pos_x + x, pos_y + y, 200, 200, 200);
+          break;
+        case 6:
+          drawPixel(pos_x + x, pos_y + y, 0, 0, 0);
+          break;
+        default:
+          break;
+      }
+    }
+}
+
+void printFireInternal(int8_t fire[], int8_t pos_x, int8_t pos_y) {
+  for (uint8_t y = 0; y < 6; ++y)
+    for (uint8_t x = 0; x < 5; ++x) {
+      uint8_t color = fire[x + 5 * (5 - y)];
+      switch (color) {
+        case 1:
+          drawPixel(pos_x + x, pos_y + y, 252, 190, 20);
+          break;
+        case 2:
+          drawPixel(pos_x + x, pos_y + y, 252, 221, 20);
+          break;
+        case 3:
+          drawPixel(pos_x + x, pos_y + y, 252, 97, 20);
+          break;
+        case 4:
+          drawPixel(pos_x + x, pos_y + y, 252, 179, 20);
+          break;
+        default:
+          break;
+      }
+    }
+}
+
+void printCandleInternal(int8_t fire[], int8_t pos_x, int8_t pos_y) {
+  for (uint8_t y = 0; y < 15; ++y)
+    for (uint8_t x = 0; x < 5; ++x) {
+      uint8_t color = fire[x + 5 * (14 - y)];
+      switch (color) {
+        case 1:
+          drawPixel(pos_x + x, pos_y + y, 247, 1116, 116);
+          break;
+        case 2:
+          drawPixel(pos_x + x, pos_y + y, 242, 68, 68);
+          break;
+        case 3:
+          drawPixel(pos_x + x, pos_y + y, 237, 24, 24);
+          break;
+        case 4:
+          drawPixel(pos_x + x, pos_y + y, 201, 4, 4);
+          break;
+        case 5:
+          drawPixel(pos_x + x, pos_y + y, 230, 204, 209);
+          break;
+        case 6:
+          drawPixel(pos_x + x, pos_y + y, 20, 10, 12);
+          break;
+        default:
+          break;
+      }
+    }
+}
+
+void printSnowfallStayInternal() {
+  for (uint8_t i = 0; i < AMOUNT_SNOWFLAKES - 1; i += 2) {
+    if (snow_fall[i + 1] == 0) {
+      snow_fall[i] = random(50);
+      snow_fall[i + 1] = random(20, 40);
+    }
+    int8_t new_x = random(4) == 3 ? snow_fall[i] + 1 : snow_fall[i] - 1;
+    int8_t new_y = snow_fall[i + 1] - 1;
+
+    uint8_t value = getSnowLand(new_x, new_y);
+
+    if (value >= SNOW_BORDER) {
+      uint8_t value_old = getSnowLand(snow_fall[i], snow_fall[i + 1]);
+      setSnowLand(snow_fall[i], snow_fall[i + 1], value_old + 1);
+      setSnowLand(new_x, new_y - 1, SNOW_BORDER);
+      setSnowLand(new_x - 1, new_y - 1, SNOW_BORDER);
+      setSnowLand(new_x + 1, new_y - 1, SNOW_BORDER);
+      new_x = random(50);
+      new_y = random(20, 40);
+    } else if (value > 0 || new_y == 0) {
+      setSnowLand(new_x, new_y, value + 1);
+    }
+    snow_fall[i] = new_x;
+    snow_fall[i + 1] = new_y;
+    drawPixel(snow_fall[i], snow_fall[i + 1], 250, 250, 250);
+  }
+}
+
+void printNum(byte num[], int8_t x, int8_t y, uint8_t red, uint8_t green, uint8_t blue) {
+  for (int num_y = 0; num_y < 10; ++num_y) {
+    for (int num_x = 0; num_x < 8; ++num_x) {
+      if (bitRead(num[(9 - num_y)], 7 - num_x) && getSnowLand(x + num_x, y + num_y) >= SNOW_BORDER)
+        drawPixel(x + num_x, y + num_y, red, green, blue);
+    }
+  }
 }
 
 void printKerzeFlackern(const int8_t x_pos) {
@@ -70,13 +379,13 @@ void printKerzeFlackern(const int8_t x_pos) {
   drawPixel(x_pos + 1, 18, 0, 0, 0);
   drawPixel(x_pos + 1, 17, 0, 0, 0);
   drawPixel(x_pos + 3, 18, 0, 0, 0);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   drawPixel(x_pos + 1, 16, 0, 0, 0);
   drawPixel(x_pos + 2, 18, 0, 0, 0);
   drawPixel(x_pos + 3, 18, red, green, blue);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal * 2);
   drawPixel(x_pos + 2, 15, red, green, blue);
@@ -86,7 +395,7 @@ void printKerzeFlackern(const int8_t x_pos) {
   drawPixel(x_pos + 3, 17, red, green, blue);
   drawPixel(x_pos + 2, 18, red, green, blue);
   drawPixel(x_pos + 3, 18, 0, 0, 0);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   drawPixel(x_pos + 3, 17, 0, 0, 0);
@@ -95,7 +404,7 @@ void printKerzeFlackern(const int8_t x_pos) {
   drawPixel(x_pos + 1, 18, red, green, blue);
   drawPixel(x_pos + 1, 17, red, green, blue);
   drawPixel(x_pos + 1, 16, red, green, blue);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal * 2);
 }
@@ -146,16 +455,16 @@ void printShip() {
       for (int8_t i = 0; i < (size_y - y) / 2; ++i)
         for (int8_t j = 0; j < i * 2; j += 2) {
           drawPixel(x + j, y + i, 0, 250, 25);
-          drawPixel(x + j + 1 , y + i, 0, 250, 25);
+          drawPixel(x + j + 1, y + i, 0, 250, 25);
         }
       y = size_y - 2;
       for (int8_t i = 0; i < 5; ++i)
         for (int8_t j = 0; j < i * 2; j += 2) {
           drawPixel(x + j, y - i, 0, 250, 25);
-          drawPixel(x + j + 1 , y - i, 0, 250, 25);
+          drawPixel(x + j + 1, y - i, 0, 250, 25);
         }
       printWaves(i % 2);
-        bright();
+      bright();
       pixels.show();
       delay(200);
     }
@@ -182,7 +491,7 @@ void printKerzeKreuz() {
   for (int8_t y = 10; y > 7; --y) {
     for (int8_t x = 12; x < 19; ++x)
       drawPixel(x, y, red, green, blue);
-      bright();
+    bright();
     pixels.show();
     delay(delayVal);
   }
@@ -193,7 +502,7 @@ void printKerzeKreuz() {
   for (int8_t y = 7; y > 5; --y) {
     for (int8_t x = 12; x < 19; ++x)
       drawPixel(x, y, red, green, blue);
-      bright();
+    bright();
     pixels.show();
     delay(delayVal);
   }
@@ -204,7 +513,7 @@ void printKerzeKreuz() {
   for (int8_t y = 5; y > 3; --y) {
     for (int8_t x = 12; x < 19; ++x)
       drawPixel(x, y, red, green, blue);
-      bright();
+    bright();
     pixels.show();
     delay(delayVal);
   }
@@ -215,7 +524,7 @@ void printKerzeKreuz() {
   for (int8_t y = 3; y > 1; --y) {
     for (int8_t x = 12; x < 19; ++x)
       drawPixel(x, y, red, green, blue);
-      bright();
+    bright();
     pixels.show();
     delay(delayVal);
   }
@@ -226,7 +535,7 @@ void printKerzeKreuz() {
   for (int8_t y = 1; y >= 0; --y) {
     for (int8_t x = 12; x < 19; ++x)
       drawPixel(x, y, red, green, blue);
-      bright();
+    bright();
     pixels.show();
     delay(delayVal);
   }
@@ -238,17 +547,17 @@ void printKerzeKreuz() {
   blue = 10;
   drawPixel(18, 0, red, green, blue);
   drawPixel(18, 4, red, green, blue);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   drawPixel(17, 1, red, green, blue);
   drawPixel(17, 5, red, green, blue);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   drawPixel(16, 1, red, green, blue);
   drawPixel(17, 6, red, green, blue);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   drawPixel(15, 2, red, green, blue);
@@ -257,14 +566,14 @@ void printKerzeKreuz() {
   drawPixel(17, 2, 0, 50, 0);
   drawPixel(16, 7, red, green, blue);
   drawPixel(17, 7, 0, 50, 0);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   drawPixel(14, 1, red, green, blue);
   drawPixel(14, 3, red, green, blue);
   drawPixel(15, 3, 0, 50, 0);
   drawPixel(15, 7, red, green, blue);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   drawPixel(13, 1, 255, 0, 0);
@@ -273,41 +582,40 @@ void printKerzeKreuz() {
   drawPixel(14, 7, red, green, blue);
   drawPixel(14, 8, red, green, blue);
   drawPixel(15, 8, 0, 50, 0);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   drawPixel(12, 5, red, green, blue);
   drawPixel(14, 5, 255, 0, 0);
   drawPixel(14, 9, red, green, blue);
   drawPixel(13, 8, 255, 0, 0);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   drawPixel(12, 6, 0, 50, 0);
   drawPixel(13, 10, red, green, blue);
   drawPixel(13, 9, 0, 50, 0);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   drawPixel(14, 11, red, green, blue);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   drawPixel(13, 12, red, green, blue);
   drawPixel(15, 11, 0, 50, 0);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   drawPixel(12, 13, red, green, blue);
   drawPixel(12, 11, 0, 50, 0);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   drawPixel(13, 13, 0, 50, 0);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
-
 }
 
 void printKelchKreuz() {
@@ -322,7 +630,7 @@ void printKelchKreuz() {
 }
 
 void printKelchHostie(int x_pos, int8_t y, uint8_t red, uint8_t green, uint8_t blue) {
-  
+
   for (int8_t x = 14; x < 17; ++x)
     drawPixel(x + x_pos, y + 7, red, green, blue);
   for (int8_t x = 13; x < 18; ++x)
@@ -342,7 +650,7 @@ void printKelchHostie(int x_pos, int8_t y, uint8_t red, uint8_t green, uint8_t b
   drawPixel(15 + x_pos, y - 3, 100, 50, 50);
   drawPixel(14 + x_pos, y - 4, 100, 50, 50);
   drawPixel(14 + x_pos, y - 5, 100, 50, 50);
-    bright();
+  bright();
 }
 
 void printKreuz() {
@@ -392,21 +700,21 @@ void printKreuz() {
     for (int8_t y = 0; y < 10; ++y) {
       for (int8_t x = 14; x < 18; ++x)
         drawPixel(x, y, red, green, blue);
-    bright();
+      bright();
       pixels.show();
       delay(delayVal);
     }
     for (int8_t y = 10; y < 14; ++y) {
       for (int8_t x = 10; x < 22; ++x)
         drawPixel(x, y, red, green, blue);
-    bright();
+      bright();
       pixels.show();
       delay(delayVal);
     }
     for (int8_t y = 14; y < 18; ++y) {
       for (int8_t x = 14; x < 18; ++x)
         drawPixel(x, y, red, green, blue);
-    bright();
+      bright();
       pixels.show();
       delay(delayVal);
     }
@@ -451,7 +759,7 @@ void printKreuz() {
   blue = 0;
   for (int8_t x = 14; x < 18; ++x)
     drawPixel(x, 9, red, green, blue);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   for (int8_t y = 10; y < 12; ++y) {
@@ -474,7 +782,7 @@ void printKreuz() {
   }
   for (int8_t x = 14; x < 18; ++x)
     drawPixel(x, 14, red, green, blue);
-    bright();
+  bright();
   pixels.show();
   delay(delayVal);
   /* rot */
@@ -515,7 +823,7 @@ void printKelchKelch(int8_t y) {
     drawPixel(x, y + 9, red, green, blue);
     drawPixel(x, y + 10, red, green, blue);
   }
-    bright();
+  bright();
 }
 
 void printKelch() {
@@ -523,17 +831,17 @@ void printKelch() {
   /* Hostie */
   for (int8_t y = 19; y > 7; --y) {
     pixels.clear();
-//    printKelchHostie(y);
+    //    printKelchHostie(y);
     pixels.show();
     delay(70);
   }
-    bright();
+  bright();
   pixels.show();
   delay(1000);
   /* Kelch */
   for (int8_t y = -9; y < 2; ++y) {
     pixels.clear();
-//    printKelchHostie(8);
+    //    printKelchHostie(8);
     printKelchKelch(y);
     bright();
     pixels.show();
@@ -542,7 +850,7 @@ void printKelch() {
   delay(1000);
   /* Kreuz */
   printKelchKreuz();
-    bright();
+  bright();
   pixels.show();
 
   delay(4000);

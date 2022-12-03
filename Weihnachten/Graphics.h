@@ -52,12 +52,12 @@ void bright() {
   /* Set Brightness with potentiometer */
   uint16_t potentioVal = analogRead(POT);
   uint16_t brightnessNew = map(potentioVal, 0, 1023, 1, 255);
-  Serial.print("potentio: ");
-  Serial.println(brightnessNew);
+  //Serial.print("potentio: ");
+  //Serial.println(brightnessNew);
   if (brightness - 1 > brightnessNew || brightness + 1 < brightnessNew) { //tolerate minmal differences
     brightness = brightnessNew;
     pixels.setBrightness(brightness);
-    Serial.println("show");
+    //Serial.println("show");
     pixels.show();
   }
 }
