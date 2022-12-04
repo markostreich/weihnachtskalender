@@ -1,3 +1,6 @@
+#ifndef GRAPHICS_CALENDAR
+#define GRAPHICS_CALENDAR
+
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
 #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
@@ -61,3 +64,18 @@ void bright() {
     pixels.show();
   }
 }
+
+void colorAll(uint8_t red, uint8_t green, uint8_t blue) {
+  bright();
+  for (int8_t y = 0; y < size_y; ++y)
+    for (int8_t x = 0; x < size_x; ++x)
+      drawPixel(x, y, red, green, blue);
+}
+
+void colorBackground() {
+  uint8_t red = 5;
+  uint8_t green = 5;
+  uint8_t blue = 5;
+  colorAll(red, green, blue);
+}
+#endif // GRAPHICS_CALENDAR

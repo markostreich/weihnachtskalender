@@ -1,5 +1,6 @@
 #include "Letter.h"
 #include "Symbols.h"
+#include "Candle.h"
 
 #define DELAYVAL 100  // Time (in milliseconds) to pause between pixels
 
@@ -15,41 +16,34 @@ void setup() {
   initSnowFlakes();
   fillSnowFall();
   clearSnowLand();
+  initCandles();
 }
-
-//int8_t start_x = 30;
-//int8_t start_y = 6;
 
 void loop() {
   //printSnowfall();
   //printSnowman();
-  printSnowflakes();
-  //  printAdventg();
+  //printSnowflakes();
+  printAdvent();
+  for (int16_t i = 0; i < 3000; ++i)
+    printCandles();
 }
 
-void printKerze(const int8_t x_pos) {
-  uint8_t red = 200;
-  uint8_t green = 5;
-  uint8_t blue = 0;
-  for (int8_t y = 0; y < 14; ++y)
-    for (int8_t x = x_pos; x < x_pos + 5; ++x)
-      drawPixel(x, y, red, green, blue);
-  red = 30;
-  green = 10;
-  blue = 0;
-  drawPixel(x_pos + 2, 14, red, green, blue);
-  drawPixel(x_pos + 2, 15, red, green, blue);
-  red = 200;
-  green = 200;
-  blue = 0;
-  /*drawPixel(x_pos + 2, 15, red, green, blue);
-  for (int8_t x = x_pos + 1; x < x_pos + 4; ++x)
-    drawPixel(x, 16, red, green, blue);
-  drawPixel(x_pos + 2, 17, red, green, blue);
-  drawPixel(x_pos + 3, 17, red, green, blue);
-  drawPixel(x_pos + 2, 18, red, green, blue);*/
+void printCandles() {
+  pixels.clear();
+  unsigned long now = millis();
+  if (now - snowfallLast >= snowfallInterval) {
+    printSnowfallInternal();
+    snowfallLast = now;
+  } else {
+    printSnowfallInternalLast();
+  }
+  printCandle(&candle_1, now);
+  candle_1.fireInterval = random(50, 70);
+  printCandle(&candle_2, now);
+  candle_2.fireInterval = random(50, 70);
   bright();
   pixels.show();
+  delay(3);
 }
 
 void printSnowfall() {
@@ -318,13 +312,13 @@ void printAdvent() {
     printLetter(letter_n, start_x + 24, start_y, 0, 255, 0);
     printLetter(letter_e, start_x + 30, start_y, 255, 255, 255);
     printLetter(letter_n, start_x + 36, start_y, 255, 0, 0);
-    printLetter(letter_1_Punkt, start_x + 44, start_y, 0, 255, 0);
-    printLetter(letter_A, start_x + 52, start_y, 255, 255, 255);
-    printLetter(letter_d, start_x + 58, start_y, 255, 0, 0);
-    printLetter(letter_v, start_x + 64, start_y, 0, 255, 0);
-    printLetter(letter_e, start_x + 70, start_y, 255, 255, 255);
-    printLetter(letter_n, start_x + 76, start_y, 255, 0, 0);
-    printLetter(letter_t, start_x + 81, start_y, 0, 255, 0);
+    printLetter(letter_2_Punkt, start_x + 44, start_y, 0, 255, 0);
+    printLetter(letter_A, start_x + 54, start_y, 255, 255, 255);
+    printLetter(letter_d, start_x + 60, start_y, 255, 0, 0);
+    printLetter(letter_v, start_x + 66, start_y, 0, 255, 0);
+    printLetter(letter_e, start_x + 72, start_y, 255, 255, 255);
+    printLetter(letter_n, start_x + 78, start_y, 255, 0, 0);
+    printLetter(letter_t, start_x + 83, start_y, 0, 255, 0);
     start_x--;
     bright();
     pixels.show();
@@ -351,12 +345,12 @@ void printWeihnachten() {
     printLetter(letter_t, start_x + 45, start_y, 0, 250, 0);
     printLetter(letter_e, start_x + 51, start_y, 250, 51, 0);
     printLetter(letter_n, start_x + 57, start_y, 250, 127, 0);
-    printLetter(letter_y, start_x + 24, start_y, 0, 0, 250 );
+    printLetter(letter_y, start_x + 24, start_y, 0, 0, 250);
     printLetter(letter_B, start_x + 36, start_y, 255, 0, 0);
     printLetter(letter_i, start_x + 42, start_y, 250, 51, 0);
     printLetter(letter_r, start_x + 48, start_y, 250, 127, 0);
     printLetter(letter_t, start_x + 54, start_y, 0, 250, 0);
-    printLetter(letter_h, start_x + 60, start_y, 0, 0, 250 );
+    printLetter(letter_h, start_x + 60, start_y, 0, 0, 250);
     printLetter(letter_d, start_x + 66, start_y, 70, 0, 250);
     printLetter(letter_a, start_x + 72, start_y, 70, 0, 250);
     printLetter(letter_y, start_x + 78, start_y, 70, 0, 250);
@@ -365,32 +359,11 @@ void printWeihnachten() {
     printLetter(letter_a, start_x + 96, start_y, 250, 51, 0);
     printLetter(letter_n, start_x + 102, start_y, 250, 127, 0);
     printLetter(letter_n, start_x + 108, start_y, 0, 250, 0);
-    printLetter(letter_a, start_x + 114, start_y, 0, 0, 250 );
-    printLetter(letter_h, start_x + 120, start_y, 70, 0, 250);*/
+    printLetter(letter_a, start_x + 114, start_y, 0, 0, 250);
+    printLetter(letter_h, start_x + 120, start_y, 70, 0, 250);
     start_x--;
     bright();
     pixels.show();
     delay(DELAYVAL);
   }
-}
-
-void colorAll(uint8_t red, uint8_t green, uint8_t blue) {
-  bright();
-  for (int8_t y = 0; y < size_y; ++y)
-    for (int8_t x = 0; x < size_x; ++x)
-      drawPixel(x, y, red, green, blue);
-}
-
-void colorBackground() {
-  uint8_t red = 5;
-  uint8_t green = 5;
-  uint8_t blue = 5;
-  colorAll(red, green, blue);
-}
-
-void printHerzen(uint8_t red, uint8_t green, uint8_t blue) {
-  printLetter(letter_Herz, 0, 12, red, green, blue);
-  printLetter(letter_Herz, 23, 12, red, green, blue);
-  printLetter(letter_Herz, 0, -2, red, green, blue);
-  printLetter(letter_Herz, 23, -2, red, green, blue);
 }

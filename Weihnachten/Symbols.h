@@ -1,7 +1,6 @@
-#include "HardwareSerial.h"
 #include "Graphics.h"
 
-#define AMOUNT_SNOWFLAKES 50
+#define AMOUNT_SNOWFLAKES 30
 
 #define SNOW_BORDER 4
 
@@ -65,13 +64,13 @@ void printSnowfallInternal() {
     }
     snow_fall[i] = random(4) == 3 ? snow_fall[i] + 1 : snow_fall[i] - 1;
     snow_fall[i + 1] -= 1;
-    drawPixel(snow_fall[i], snow_fall[i + 1], 70, 70, 250);
+    drawPixel(snow_fall[i], snow_fall[i + 1], 250, 250, 250);
   }
 }
 
 void printSnowfallInternalLast() {
   for (uint8_t i = 0; i < AMOUNT_SNOWFLAKES - 1; i += 2) {
-    drawPixel(snow_fall[i], snow_fall[i + 1], 70, 70, 250);
+    drawPixel(snow_fall[i], snow_fall[i + 1], 250, 250, 250);
   }
 }
 
@@ -275,51 +274,58 @@ void printSnowmanInternal(int8_t pos_x, int8_t pos_y) {
     }
 }
 
-void printFireInternal(int8_t fire[], int8_t pos_x, int8_t pos_y) {
-  for (uint8_t y = 0; y < 6; ++y)
-    for (uint8_t x = 0; x < 5; ++x) {
-      uint8_t color = fire[x + 5 * (5 - y)];
+void printPalmInternal(int8_t pos_x, int8_t pos_y) {
+  for (uint8_t y = 0; y < 25; ++y)
+    for (uint8_t x = 0; x < 24; ++x) {
+      uint8_t color = snowman[x + 11 * (12 - y)];
       switch (color) {
         case 1:
-          drawPixel(pos_x + x, pos_y + y, 252, 190, 20);
+          drawPixel(pos_x + x, pos_y + y, 163, 131, 101);
           break;
         case 2:
-          drawPixel(pos_x + x, pos_y + y, 252, 221, 20);
+          drawPixel(pos_x + x, pos_y + y, 140, 116, 138);
           break;
         case 3:
-          drawPixel(pos_x + x, pos_y + y, 252, 97, 20);
+          drawPixel(pos_x + x, pos_y + y, 135, 106, 78);
           break;
         case 4:
-          drawPixel(pos_x + x, pos_y + y, 252, 179, 20);
-          break;
-        default:
-          break;
-      }
-    }
-}
-
-void printCandleInternal(int8_t fire[], int8_t pos_x, int8_t pos_y) {
-  for (uint8_t y = 0; y < 15; ++y)
-    for (uint8_t x = 0; x < 5; ++x) {
-      uint8_t color = fire[x + 5 * (14 - y)];
-      switch (color) {
-        case 1:
-          drawPixel(pos_x + x, pos_y + y, 247, 1116, 116);
-          break;
-        case 2:
-          drawPixel(pos_x + x, pos_y + y, 242, 68, 68);
-          break;
-        case 3:
-          drawPixel(pos_x + x, pos_y + y, 237, 24, 24);
-          break;
-        case 4:
-          drawPixel(pos_x + x, pos_y + y, 201, 4, 4);
+          drawPixel(pos_x + x, pos_y + y, 128, 89, 52);
           break;
         case 5:
-          drawPixel(pos_x + x, pos_y + y, 230, 204, 209);
+          drawPixel(pos_x + x, pos_y + y, 79, 52, 27);
           break;
         case 6:
-          drawPixel(pos_x + x, pos_y + y, 20, 10, 12);
+          drawPixel(pos_x + x, pos_y + y, 25, 143, 1);
+          break;
+        case 7:
+          drawPixel(pos_x + x, pos_y + y, 62, 166, 41);
+          break;
+        case 8:
+          drawPixel(pos_x + x, pos_y + y, 130, 232, 176);
+          break;
+        case 9:
+          drawPixel(pos_x + x, pos_y + y, 107, 181, 92);
+          break;
+        case 10:
+          drawPixel(pos_x + x, pos_y + y, 162, 181, 92);
+          break;
+        case 11:
+          drawPixel(pos_x + x, pos_y + y, 207, 232, 130);
+          break;
+        case 12:
+          drawPixel(pos_x + x, pos_y + y, 102, 212, 144);
+          break;
+        case 13:
+          drawPixel(pos_x + x, pos_y + y, 247, 238, 163);
+          break;
+        case 14:
+          drawPixel(pos_x + x, pos_y + y, 171, 162, 97);
+          break;
+        case 15:
+          drawPixel(pos_x + x, pos_y + y, 194, 185, 122);
+          break;
+        case 16:
+          drawPixel(pos_x + x, pos_y + y, 222, 214, 158);
           break;
         default:
           break;
@@ -854,4 +860,11 @@ void printKelch() {
   pixels.show();
 
   delay(4000);
+}
+
+void printHerzen(uint8_t red, uint8_t green, uint8_t blue) {
+  printLetter(letter_Herz, 0, 12, red, green, blue);
+  printLetter(letter_Herz, 23, 12, red, green, blue);
+  printLetter(letter_Herz, 0, -2, red, green, blue);
+  printLetter(letter_Herz, 23, -2, red, green, blue);
 }
