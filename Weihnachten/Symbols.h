@@ -1,6 +1,6 @@
 #include "Graphics.h"
 
-#define AMOUNT_SNOWFLAKES 30
+#define AMOUNT_SNOWFLAKES 50
 
 #define SNOW_BORDER 4
 
@@ -56,6 +56,20 @@ void printSnowLand() {
   }
 }
 
+void printSnowLandPalm() {
+  uint8_t amount_top = 0;
+  for (uint16_t i = 0; i < NUMPIXELS; ++i) {
+    if (snow_land[i] >= SNOW_BORDER) {
+      if (i > 119)
+        pixels.setPixelColor(i, pixels.Color(70, 70, 250));
+      else
+        pixels.setPixelColor(i, pixels.Color(0, 0, 150));
+      if (i > NUMPIXELS - size_x && ++amount_top > 10)
+        clearSnowLand();
+    }
+  }
+}
+
 void printSnowfallInternal() {
   for (uint8_t i = 0; i < AMOUNT_SNOWFLAKES - 1; i += 2) {
     if (snow_fall[i + 1] == 0) {
@@ -65,6 +79,18 @@ void printSnowfallInternal() {
     snow_fall[i] = random(4) == 3 ? snow_fall[i] + 1 : snow_fall[i] - 1;
     snow_fall[i + 1] -= 1;
     drawPixel(snow_fall[i], snow_fall[i + 1], 250, 250, 250);
+  }
+}
+
+void printSnowfallPalmInternal() {
+  for (uint8_t i = 0; i < AMOUNT_SNOWFLAKES - 1; i += 2) {
+    if (snow_fall[i + 1] == 0) {
+      snow_fall[i] = random(40);
+      snow_fall[i + 1] = random(20, 40);
+    }
+    snow_fall[i] = random(4) == 3 ? snow_fall[i] + 1 : snow_fall[i] - 1;
+    snow_fall[i + 1] -= 1;
+    drawPixel(snow_fall[i], snow_fall[i + 1], 70, 70, 250);
   }
 }
 
@@ -275,57 +301,52 @@ void printSnowmanInternal(int8_t pos_x, int8_t pos_y) {
 }
 
 void printPalmInternal(int8_t pos_x, int8_t pos_y) {
-  for (uint8_t y = 0; y < 25; ++y)
-    for (uint8_t x = 0; x < 24; ++x) {
-      uint8_t color = snowman[x + 11 * (12 - y)];
+  for (uint8_t y = 0; y < 16; ++y)
+    for (uint8_t x = 0; x < 16; ++x) {
+      uint8_t color = palm[x + 16 * (15 - y)];
       switch (color) {
-        case 1:
-          drawPixel(pos_x + x, pos_y + y, 163, 131, 101);
-          break;
         case 2:
-          drawPixel(pos_x + x, pos_y + y, 140, 116, 138);
+          drawPixel(pos_x + x, pos_y + y, 255, 131, 101);
           break;
+        case 1:
+          //drawPixel(pos_x + x, pos_y + y, 163, 131, 101);
+          //break;
         case 3:
-          drawPixel(pos_x + x, pos_y + y, 135, 106, 78);
+          //drawPixel(pos_x + x, pos_y + y, 135, 106, 78);
+          //break;
+          drawPixel(pos_x + x, pos_y + y, 228, 89, 52);
           break;
         case 4:
-          drawPixel(pos_x + x, pos_y + y, 128, 89, 52);
-          break;
         case 5:
           drawPixel(pos_x + x, pos_y + y, 79, 52, 27);
           break;
         case 6:
-          drawPixel(pos_x + x, pos_y + y, 25, 143, 1);
+          drawPixel(pos_x + x, pos_y + y, 25, 243, 1);
           break;
         case 7:
-          drawPixel(pos_x + x, pos_y + y, 62, 166, 41);
+          drawPixel(pos_x + x, pos_y + y, 62, 255, 41);
           break;
         case 8:
-          drawPixel(pos_x + x, pos_y + y, 130, 232, 176);
+          //drawPixel(pos_x + x, pos_y + y, 35, 90, 45);
           break;
         case 9:
-          drawPixel(pos_x + x, pos_y + y, 107, 181, 92);
+          drawPixel(pos_x + x, pos_y + y, 97, 1, 10);
           break;
         case 10:
-          drawPixel(pos_x + x, pos_y + y, 162, 181, 92);
+          drawPixel(pos_x + x, pos_y + y, 34, 37, 22);
           break;
         case 11:
-          drawPixel(pos_x + x, pos_y + y, 207, 232, 130);
+          //drawPixel(pos_x + x, pos_y + y, 22, 32, 15);
           break;
         case 12:
-          drawPixel(pos_x + x, pos_y + y, 102, 212, 144);
+          drawPixel(pos_x + x, pos_y + y, 13, 37, 14);
           break;
         case 13:
-          drawPixel(pos_x + x, pos_y + y, 247, 238, 163);
-          break;
         case 14:
-          drawPixel(pos_x + x, pos_y + y, 171, 162, 97);
-          break;
         case 15:
-          drawPixel(pos_x + x, pos_y + y, 194, 185, 122);
-          break;
         case 16:
-          drawPixel(pos_x + x, pos_y + y, 222, 214, 158);
+          drawPixel(pos_x + x, pos_y + y, 255, 252, 10);
+          //drawPixel(pos_x + x, pos_y + y, 222, 214, 158);
           break;
         default:
           break;
@@ -358,6 +379,34 @@ void printSnowfallStayInternal() {
     snow_fall[i] = new_x;
     snow_fall[i + 1] = new_y;
     drawPixel(snow_fall[i], snow_fall[i + 1], 250, 250, 250);
+  }
+}
+
+void printSnowfallStayPalmInternal() {
+  for (uint8_t i = 0; i < AMOUNT_SNOWFLAKES - 1; i += 2) {
+    if (snow_fall[i + 1] == 0) {
+      snow_fall[i] = random(50);
+      snow_fall[i + 1] = random(20, 40);
+    }
+    int8_t new_x = random(4) == 3 ? snow_fall[i] + 1 : snow_fall[i] - 1;
+    int8_t new_y = snow_fall[i + 1] - 1;
+
+    uint8_t value = getSnowLand(new_x, new_y);
+
+    if (value >= SNOW_BORDER) {
+      uint8_t value_old = getSnowLand(snow_fall[i], snow_fall[i + 1]);
+      setSnowLand(snow_fall[i], snow_fall[i + 1], value_old + 1);
+      setSnowLand(new_x, new_y - 1, SNOW_BORDER);
+      setSnowLand(new_x - 1, new_y - 1, SNOW_BORDER);
+      setSnowLand(new_x + 1, new_y - 1, SNOW_BORDER);
+      new_x = random(50);
+      new_y = random(20, 40);
+    } else if (value > 0 || new_y == 0) {
+      setSnowLand(new_x, new_y, value + 1);
+    }
+    snow_fall[i] = new_x;
+    snow_fall[i + 1] = new_y;
+    drawPixel(snow_fall[i], snow_fall[i + 1], 70, 70, 250);
   }
 }
 
