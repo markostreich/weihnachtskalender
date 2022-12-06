@@ -50,7 +50,7 @@ void printSnowLand() {
   for (uint16_t i = 0; i < NUMPIXELS; ++i) {
     if (snow_land[i] >= SNOW_BORDER) {
       pixels.setPixelColor(i, pixels.Color(150, 150, 150));
-      if (i > NUMPIXELS - size_x && ++amount_top > 10)
+      if (i > NUMPIXELS - size_x * 4 && ++amount_top > 5)
         clearSnowLand();
     }
   }
@@ -269,6 +269,56 @@ void glowSnowflake(Snowflake flake) {
       ++y;
     }
   }
+}
+
+void printSantaInternal(int8_t pos_x, int8_t pos_y) {
+  for (uint8_t y = 0; y < 14; ++y)
+    for (uint8_t x = 0; x < 10; ++x) {
+      uint8_t color = santa[x + 10 * (13 - y)];
+      switch (color) {
+        case 1:
+          drawPixel(pos_x + x, pos_y + y, 78, 12, 21);
+          break;
+        case 2:
+          drawPixel(pos_x + x, pos_y + y, 62, 20, 8);
+          break;
+        case 3:
+          drawPixel(pos_x + x, pos_y + y, 86, 65, 44);
+          break;
+        case 4:
+          drawPixel(pos_x + x, pos_y + y, 254, 13, 11);
+          break;
+        case 5:
+          drawPixel(pos_x + x, pos_y + y, 201, 7, 28);
+          break;
+        case 6:
+          drawPixel(pos_x + x, pos_y + y, 229, 82, 93);
+          break;
+        case 7:
+          drawPixel(pos_x + x, pos_y + y, 192, 192, 192);
+          break;
+        case 8:
+          drawPixel(pos_x + x, pos_y + y, 238, 238, 238);
+          break;
+        case 9:
+          drawPixel(pos_x + x, pos_y + y, 205, 116, 102);
+          break;
+        case 10:
+          drawPixel(pos_x + x, pos_y + y, 224, 185, 172);
+          break;
+        case 11:
+          drawPixel(pos_x + x, pos_y + y, 142, 131, 118);
+          break;
+        case 12:
+          drawPixel(pos_x + x, pos_y + y, 248, 155, 126);
+          break;
+        case 13:
+          drawPixel(pos_x + x, pos_y + y, 179, 123, 129);
+          break;
+        default:
+          break;
+      }
+    }
 }
 
 void printSnowmanInternal(int8_t pos_x, int8_t pos_y) {

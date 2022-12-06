@@ -26,7 +26,8 @@ void loop() {
   /*printAdvent();
   for (int16_t i = 0; i < 3000; ++i)
     printCandles();*/
-  printPalm();
+  //printPalm();
+  printSanta();
 }
 
 void printCandles() {
@@ -75,6 +76,17 @@ void printPalm() {
   printPalmInternal(14, 0);
   printSnowfallStayInternal();
   printNum(number_5, 2, 0, 97, 1, 10);
+  bright();
+  pixels.show();
+  delay(130);
+}
+
+void printSanta() {
+  pixels.clear();
+  printSantaInternal(14, 2);
+  printSnowLand();
+  printSnowfallStayInternal();
+  printNum(number_6, 3, 2, 1, 255, 10);
   bright();
   pixels.show();
   delay(130);
