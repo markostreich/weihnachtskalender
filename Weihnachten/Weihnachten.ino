@@ -21,13 +21,14 @@ void setup() {
 
 void loop() {
   //printSnowfall();
-  //printSnowman();
+  printSnowman();
   //printSnowflakes();
   /*printAdvent();
   for (int16_t i = 0; i < 3000; ++i)
     printCandles();*/
   //printPalm();
-  printSanta();
+  //printSanta();
+  //printSnowflakeTest();
 }
 
 void printCandles() {
@@ -60,10 +61,10 @@ void printSnowfall() {
 
 void printSnowman() {
   pixels.clear();
-  printSnowmanInternal(3, 0);
+  printSnowmanInternal(15, 0);
   printSnowLand();
   printSnowfallStayInternal();
-  printNum(number_2, 19, 2, 200, 50, 46);
+  printNum(number_7, 4, 2, 40, 40, 250);
   bright();
   pixels.show();
   delay(130);
@@ -92,6 +93,17 @@ void printSanta() {
   delay(130);
 }
 
+void printSnowflakeTest() {
+  pixels.clear();
+  for (float i = 0.0; i < 361; i += 11.0) {
+  pixels.clear();
+    printSnowflakeRotatedInternal(snowflakeBig, i);
+    printSnowflakeRotatedInternal(snowflakeNum3, i);
+    bright();
+    pixels.show();
+    delay(70);
+  }
+}
 
 void printSnowflakes() {
   unsigned long now = millis();
@@ -138,7 +150,6 @@ void printSnowflakes() {
   } else {
     printSnowflakeInternal(snowflakeBig);
   }
-
 
   if (now - snowflake1.lastMove >= snowflake1.moveInterval) {
     snowflake1.lastMove = now;

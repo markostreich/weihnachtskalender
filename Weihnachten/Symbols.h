@@ -50,7 +50,7 @@ void printSnowLand() {
   for (uint16_t i = 0; i < NUMPIXELS; ++i) {
     if (snow_land[i] >= SNOW_BORDER) {
       pixels.setPixelColor(i, pixels.Color(150, 150, 150));
-      if (i > NUMPIXELS - size_x * 4 && ++amount_top > 5)
+      if (i > NUMPIXELS - size_x * 2 && ++amount_top > 5)
         clearSnowLand();
     }
   }
@@ -144,14 +144,14 @@ Snowflake snowflakeNum3;
 
 void initSnowFlakes() {
   /* snowflake big */
-  snowflakeBig.snow_flake = snowflakeTiny_2;
-  snowflakeBig.pos_x = random(27);
-  snowflakeBig.pos_y = random(20, 80);
-  snowflakeBig.size_x = 3;
-  snowflakeBig.size_y = 3;
-  snowflakeBig.red = random(40, 70);
-  snowflakeBig.green = random(40, 70);
-  snowflakeBig.blue = random(200, 250);
+  snowflakeBig.snow_flake = snowflakeBig_1;
+  snowflakeBig.pos_x = 8;
+  snowflakeBig.pos_y = 3;
+  snowflakeBig.size_x = 13;
+  snowflakeBig.size_y = 14;
+  snowflakeBig.red = 100;
+  snowflakeBig.green = 100;
+  snowflakeBig.blue = 0;
   snowflakeBig.interval = random(200, 1000);
   snowflakeBig.glowInterval = 0;
   snowflakeBig.moveInterval = random(10, 30);
@@ -197,8 +197,10 @@ void initSnowFlakes() {
 
   /* snowflake tiny 4 */
   snowflake4.snow_flake = snowflakeTiny_4;
-  snowflake4.pos_x = random(27);
-  snowflake4.pos_y = random(20, 80);
+  snowflake4.pos_x = 13;
+  snowflake4.pos_y = 8;
+  //snowflake4.pos_x = random(27);
+  //snowflake4.pos_y = random(20, 80);
   snowflake4.size_x = 5;
   snowflake4.size_y = 5;
   snowflake4.red = random(40, 70);
@@ -210,8 +212,8 @@ void initSnowFlakes() {
 
   /* number 3 */
   snowflakeNum3.snow_flake = snowflake_3;
-  snowflakeNum3.pos_x = random(27);
-  snowflakeNum3.pos_y = random(20, 80);
+  snowflakeNum3.pos_x = 1;
+  snowflakeNum3.pos_y = 1;
   snowflakeNum3.size_x = 4;
   snowflakeNum3.size_y = 7;
   snowflakeNum3.red = 100;
@@ -224,6 +226,7 @@ void initSnowFlakes() {
 
 unsigned long snowfallInterval = 40;
 unsigned long snowfallLast = 0;
+
 void printSnowflakeInternal(const Snowflake flake) {
   for (uint8_t y = 0; y < flake.size_y; ++y)
     for (uint8_t x = 0; x < flake.size_x; ++x) {
@@ -231,6 +234,31 @@ void printSnowflakeInternal(const Snowflake flake) {
       switch (color) {
         case 1:
           drawPixel(flake.pos_x + x, flake.pos_y + y, flake.red, flake.green, flake.blue);
+          break;
+        default:
+          break;
+      }
+    }
+}
+
+void printSnowflakeRotatedInternal(const Snowflake flake, float angle) {
+  float angle_rad = angle * M_PI / 180.0;
+  float cosTau = cos(angle_rad);
+  float sinTau = sin(angle_rad);
+  //int8_t rot_x = flake.pos_x + flake.size_x / 2;
+  //int8_t rot_y = flake.pos_y + flake.size_y / 2;
+  //float rot_x = (float)flake.pos_x + (float)flake.size_x / (float)2.0;
+  //float rot_y = (float)flake.pos_y + (float)flake.size_y / (float)2.0;
+  float rot_x = flake.pos_x + flake.size_x / 2;
+  float rot_y = flake.pos_y + flake.size_y / 2;
+  //int8_t rot_x = 15;
+  //int8_t rot_y = 10;
+  for (uint8_t y = 0; y < flake.size_y; ++y)
+    for (uint8_t x = 0; x < flake.size_x; ++x) {
+      uint8_t color = flake.snow_flake[x + flake.size_x * (flake.size_y - 1 - y)];
+      switch (color) {
+        case 1:
+          drawRotatedPixel(flake.pos_x + x, flake.pos_y + y, rot_x, rot_y, cosTau, sinTau, flake.red, flake.green, flake.blue);
           break;
         default:
           break;

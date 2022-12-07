@@ -3,7 +3,7 @@
 
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
-#include <avr/power.h> // Required for 16 MHz Adafruit Trinket
+#include <avr/power.h>  // Required for 16 MHz Adafruit Trinket
 #endif
 
 #define NUMPIXELS 600
@@ -33,6 +33,14 @@ void drawPixel(int8_t x, int8_t y, uint8_t red, uint8_t green, uint8_t blue) {
   pixels.setPixelColor(pos_x + size_x * y, pixels.Color(red, green, blue));
 }
 
+void drawRotatedPixel(int8_t x, int8_t y, float rot_x, float rot_y, float cosTau, float sinTau, uint8_t red, uint8_t green, uint8_t blue) {
+  float new_x = rot_x + cosTau * ((float)x - rot_x) + sinTau * ((float)y - rot_y);
+  float new_y = rot_y - sinTau * ((float)x - rot_x) + cosTau * ((float)y - rot_y);
+  //float new_x = cosTau * ((float)x - 14.5) + sinTau * ((float)y-9.5);
+  //float new_y = -sinTau * ((float)x - 14.5) + cosTau * ((float)y-9.5);
+  drawPixel((int8_t)(new_x + 0.5), (int8_t)(new_y + 0.5), red, green, blue);
+}
+
 void printLetter(byte letter[], int8_t x, int8_t y, uint8_t red, uint8_t green, uint8_t blue) {
   for (int letter_y = 0; letter_y < 7; ++letter_y) {
     for (int letter_x = 0; letter_x < 8; ++letter_x) {
@@ -57,7 +65,7 @@ void bright() {
   uint16_t brightnessNew = map(potentioVal, 0, 1023, 1, 255);
   //Serial.print("potentio: ");
   //Serial.println(brightnessNew);
-  if (brightness - 1 > brightnessNew || brightness + 1 < brightnessNew) { //tolerate minmal differences
+  if (brightness - 1 > brightnessNew || brightness + 1 < brightnessNew) {  //tolerate minmal differences
     brightness = brightnessNew;
     pixels.setBrightness(brightness);
     //Serial.println("show");
@@ -78,4 +86,4 @@ void colorBackground() {
   uint8_t blue = 5;
   colorAll(red, green, blue);
 }
-#endif // GRAPHICS_CALENDAR
+#endif  // GRAPHICS_CALENDAR
