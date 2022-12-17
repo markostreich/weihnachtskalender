@@ -21,14 +21,17 @@ void setup() {
 
 void loop() {
   //printSnowfall();
-  printSnowman();
+  //printSnowman();
   //printSnowflakes();
   /*printAdvent();
   for (int16_t i = 0; i < 3000; ++i)
     printCandles();*/
   //printPalm();
   //printSanta();
-  //printSnowflakeTest();
+  //printSnowflakeRotation();
+  //printChristmasTree();
+  //printMario();
+  printSwords();
 }
 
 void printCandles() {
@@ -44,6 +47,8 @@ void printCandles() {
   candle_1.fireInterval = random(50, 70);
   printCandle(&candle_2, now);
   candle_2.fireInterval = random(50, 70);
+  printCandle(&candle_3, now);
+  candle_3.fireInterval = random(50, 70);
   bright();
   pixels.show();
   delay(3);
@@ -82,6 +87,27 @@ void printPalm() {
   delay(130);
 }
 
+bool firstColor = true;
+unsigned long treeInterval = 2000;
+unsigned long lastTreeTime = 0;
+
+void printChristmasTree() {
+  unsigned long now = millis();
+  if (now - lastTreeTime >= treeInterval) {
+    firstColor = !firstColor;
+    lastTreeTime = now;
+  }
+  pixels.clear();
+  //colorAll(0, 0, 255);
+  printSnowLand();
+  printChristmasTreeInternal(14, 0, firstColor);
+  printSnowfallStayInternal();
+  printNum(number_9, 2, 2, 240, 1, 10);
+  bright();
+  pixels.show();
+  delay(130);
+}
+
 void printSanta() {
   pixels.clear();
   printSantaInternal(14, 2);
@@ -93,12 +119,209 @@ void printSanta() {
   delay(130);
 }
 
-void printSnowflakeTest() {
+void printMario() {
+  for (uint8_t n = 0; n < 3; ++n) {
+    pixels.clear();
+    colorAll(0, 0, 40);
+    printMarioInternal(7, 2);
+    bright();
+    pixels.show();
+    delay(1500);
+    for (float i = 0.0; i < 361; i += 33.0) {
+      pixels.clear();
+      colorAll(0, 0, 40);
+      printMarioRotatedInternal(i, 7, 2);
+      bright();
+      pixels.show();
+      delay(30);
+    }
+    pixels.clear();
+    colorAll(0, 0, 40);
+    printMarioInternal(7, 2);
+    bright();
+    pixels.show();
+    delay(1500);
+  }
+}
+
+void printSword() {
+  uint8_t r = 0;
+  uint8_t g = 0;
+  uint8_t b = 0;
+  for (uint8_t n = 0; n < 3; ++n) {
+    float a = -40.0;
+    for (int8_t i = -15; i < 8; ++i) {
+      pixels.clear();
+      colorAll(r, g, b);
+      printSwordRotatedInternal(a, i, 2, 5.0, 5.0);
+      bright();
+      pixels.show();
+      delay(30);
+    }
+    for (uint8_t i = 0; i < 3; ++i) {
+      for (; a < 45.0; a += 11.0) {
+        pixels.clear();
+        colorAll(r, g, b);
+        printSwordRotatedInternal(a, 7, 2, 5.0, 5.0);
+        bright();
+        pixels.show();
+        delay(10);
+      }
+      for (; a >= -30.0; a -= 11.0) {
+        pixels.clear();
+        colorAll(r, g, b);
+        printSwordRotatedInternal(a, 7, 2, 5.0, 5.0);
+        bright();
+        pixels.show();
+        delay(30);
+      }
+    }
+    for (; a <= 0.0; a += 11.0) {
+      pixels.clear();
+      colorAll(r, g, b);
+      printSwordRotatedInternal(a, 7, 2, 5.0, 5.0);
+      bright();
+      pixels.show();
+      delay(30);
+    }
+    pixels.clear();
+    colorAll(r, g, b);
+    printSwordInternal(7, 2);
+    bright();
+    pixels.show();
+    delay(1000);
+    for (int8_t i = 2; i > -17; --i) {
+      pixels.clear();
+      colorAll(r, g, b);
+      printSwordInternal(7, i);
+      bright();
+      pixels.show();
+      delay(30);
+    }
+    delay(1000);
+  }
+}
+
+uint8_t randomOne() {
+  return random(2) == 1 ? random(2) == 1 ? 2 : -2 : 0;
+}
+
+void printSwords() {
+  uint8_t r = 0;
+  uint8_t g = 0;
+  uint8_t b = 0;
+  for (uint8_t n = 0; n < 3; ++n) {
+    float a0 = -45.0;
+    float a1 = -45.0;
+    for (int8_t i = -15; i < 1; ++i) {
+      pixels.clear();
+      colorAll(r, g, b);
+      printSnowflakeInternal(snowflakeNum1);
+      printSnowflakeInternal(snowflakeNum5);
+      printSwordRotatedInternal(a0, i, 2, i + 4, 6);
+      printSwordRotatedInternal(a1, 20 - i, 2, 20 - i + 4, 6);
+      bright();
+      pixels.show();
+      delay(30);
+    }
+    for (uint8_t i = 0; i < 12; ++i) {
+      uint8_t dx0 = randomOne();
+      uint8_t dy0 = randomOne();
+      uint8_t dx1 = randomOne();
+      uint8_t dy1 = randomOne();
+      for (; a0 < 45.0; a0 += random(11.0, 22.0)) {
+        a1 -= random(11.0, 22.0);
+        pixels.clear();
+        colorAll(r, g, b);
+        printSnowflakeInternal(snowflakeNum1);
+        printSnowflakeInternal(snowflakeNum5);
+        printSwordRotatedInternal(a0, 0 + dx0, 2 + dy0, 4, 6);
+        printSwordRotatedInternal(a1, 20 + dx1, 2 + dy1, 24, 6);
+        bright();
+        pixels.show();
+        delay(10);
+      }
+      for (; a0 >= -30.0 || a1 <= -30.0; a0 -= 11.0) {
+        a1 += 11.0;
+        pixels.clear();
+        colorAll(r, g, b);
+        printSnowflakeInternal(snowflakeNum1);
+        printSnowflakeInternal(snowflakeNum5);
+        printSwordRotatedInternal(a0, 0, 2, 4, 6);
+        printSwordRotatedInternal(a1, 20, 2, 24, 6);
+        bright();
+        pixels.show();
+        delay(30);
+      }
+    }
+    for (; a0 <= 0.0; a0 += 11.0) {
+      a1 -= 11.0;
+      pixels.clear();
+      colorAll(r, g, b);
+      printSnowflakeInternal(snowflakeNum1);
+      printSnowflakeInternal(snowflakeNum5);
+      printSwordRotatedInternal(a0, 0, 2, 4, 6);
+      printSwordRotatedInternal(a1, 20, 2, 24, 6);
+      bright();
+      pixels.show();
+      delay(30);
+    }
+    pixels.clear();
+    colorAll(r, g, b);
+    printSnowflakeInternal(snowflakeNum1);
+    printSnowflakeInternal(snowflakeNum5);
+    printSwordRotatedInternal(a0, 0, 2, 4, 6);
+    printSwordRotatedInternal(a1, 20, 2, 24, 6);
+    bright();
+    pixels.show();
+    delay(1000);
+    for (int8_t i = 2; i > -25; i -= 2) {
+      pixels.clear();
+      colorAll(r, g, b);
+      printSnowflakeInternal(snowflakeNum1);
+      printSnowflakeInternal(snowflakeNum5);
+      printSwordRotatedInternal(a0, 0, i, 4, 2 + i + 4);
+      printSwordRotatedInternal(a1, 20, i, 24, i + 4);
+      bright();
+      pixels.show();
+      delay(30);
+    }
+    delay(1000);
+  }
+}
+
+void printSchaedel() {
+  for (uint8_t i = 0; i < 3; ++i) {
+    pixels.clear();
+    printSchaedelInternal(0, 1, 2, 255, 255, 255);
+    bright();
+    pixels.show();
+    delay(1000);
+    for (uint8_t n = 0; n < 8; ++n) {
+      pixels.clear();
+      printSchaedelInternal(n, 1, 2, 255, 255, 255);
+      bright();
+      pixels.show();
+      delay(150);
+    }
+    pixels.clear();
+    printSchaedelInternal(0, 1, 2, 255, 255, 255);
+    bright();
+    pixels.show();
+    delay(1000);
+  }
+}
+
+void printSnowflakeRotation() {
   pixels.clear();
   for (float i = 0.0; i < 361; i += 11.0) {
-  pixels.clear();
+    pixels.clear();
+    printSnowflakeRotatedInternal(snowflakeBig2, i);
     printSnowflakeRotatedInternal(snowflakeBig, i);
-    printSnowflakeRotatedInternal(snowflakeNum3, i);
+    //printSnowflakeRotatedInternal(snowflakeNum1, i);
+    printSnowflakeInternal(snowflakeNum1);
+    //printSnowflakeRotatedInternal(snowflakeNum0, i);
+    printSnowflakeInternal(snowflakeNum0);
     bright();
     pixels.show();
     delay(70);
@@ -348,7 +571,7 @@ void printAdvent() {
     printLetter(letter_n, start_x + 24, start_y, 0, 255, 0);
     printLetter(letter_e, start_x + 30, start_y, 255, 255, 255);
     printLetter(letter_n, start_x + 36, start_y, 255, 0, 0);
-    printLetter(letter_2_Punkt, start_x + 44, start_y, 0, 255, 0);
+    printLetter(letter_3_Punkt, start_x + 44, start_y, 0, 255, 0);
     printLetter(letter_A, start_x + 54, start_y, 255, 255, 255);
     printLetter(letter_d, start_x + 60, start_y, 255, 0, 0);
     printLetter(letter_v, start_x + 66, start_y, 0, 255, 0);

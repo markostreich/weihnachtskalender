@@ -1,6 +1,6 @@
 #include "Graphics.h"
 
-#define AMOUNT_SNOWFLAKES 50
+#define AMOUNT_SNOWFLAKES 30
 
 #define SNOW_BORDER 4
 
@@ -136,25 +136,41 @@ struct Snowflake {
 };
 
 Snowflake snowflakeBig;
+Snowflake snowflakeBig2;
 Snowflake snowflake1;
 Snowflake snowflake2;
 Snowflake snowflake3;
 Snowflake snowflake4;
+Snowflake snowflakeNum5;
 Snowflake snowflakeNum3;
+Snowflake snowflakeNum1;
+Snowflake snowflakeNum0;
 
 void initSnowFlakes() {
   /* snowflake big */
   snowflakeBig.snow_flake = snowflakeBig_1;
-  snowflakeBig.pos_x = 8;
-  snowflakeBig.pos_y = 3;
+  snowflakeBig.pos_x = 1;
+  snowflakeBig.pos_y = 0;
   snowflakeBig.size_x = 13;
   snowflakeBig.size_y = 14;
-  snowflakeBig.red = 100;
-  snowflakeBig.green = 100;
-  snowflakeBig.blue = 0;
+  snowflakeBig.red = 0;
+  snowflakeBig.green = 200;
+  snowflakeBig.blue = 150;
   snowflakeBig.interval = random(200, 1000);
   snowflakeBig.glowInterval = 0;
   snowflakeBig.moveInterval = random(10, 30);
+  /* snowflake big */
+  snowflakeBig2.snow_flake = snowflakeBig_2;
+  snowflakeBig2.pos_x = 18;
+  snowflakeBig2.pos_y = 7;
+  snowflakeBig2.size_x = 11;
+  snowflakeBig2.size_y = 13;
+  snowflakeBig2.red = 0;
+  snowflakeBig2.green = 50;
+  snowflakeBig2.blue = 200;
+  snowflakeBig2.interval = random(200, 1000);
+  snowflakeBig2.glowInterval = 0;
+  snowflakeBig2.moveInterval = random(10, 30);
 
   /* snowflake tiny 1 */
   snowflake1.snow_flake = snowflakeTiny_1;
@@ -212,16 +228,55 @@ void initSnowFlakes() {
 
   /* number 3 */
   snowflakeNum3.snow_flake = snowflake_3;
-  snowflakeNum3.pos_x = 1;
-  snowflakeNum3.pos_y = 1;
+  snowflakeNum3.pos_x = 26;
+  snowflakeNum3.pos_y = 0;
   snowflakeNum3.size_x = 4;
   snowflakeNum3.size_y = 7;
-  snowflakeNum3.red = 100;
-  snowflakeNum3.green = 50;
+  snowflakeNum3.red = 200;
+  snowflakeNum3.green = 70;
   snowflakeNum3.blue = 200;
   snowflakeNum3.interval = random(200, 1000);
   snowflakeNum3.glowInterval = 15;
   snowflakeNum3.moveInterval = random(70);
+
+  /* number 5 */
+  snowflakeNum5.snow_flake = snowflake_5;
+  snowflakeNum5.pos_x = 26;
+  snowflakeNum5.pos_y = 0;
+  snowflakeNum5.size_x = 4;
+  snowflakeNum5.size_y = 7;
+  snowflakeNum5.red = 100;
+  snowflakeNum5.green = 0;
+  snowflakeNum5.blue = 20;
+  snowflakeNum5.interval = random(200, 1000);
+  snowflakeNum5.glowInterval = 15;
+  snowflakeNum5.moveInterval = random(70);
+
+  /* number 1 */
+  snowflakeNum1.snow_flake = snowflake_1;
+  snowflakeNum1.pos_x = 22;
+  snowflakeNum1.pos_y = 0;
+  snowflakeNum1.size_x = 4;
+  snowflakeNum1.size_y = 7;
+  snowflakeNum1.red = 100;
+  snowflakeNum1.green = 0;
+  snowflakeNum1.blue = 20;
+  snowflakeNum1.interval = random(200, 1000);
+  snowflakeNum1.glowInterval = 15;
+  snowflakeNum1.moveInterval = random(70);
+
+  /* number 0 */
+  snowflakeNum0.snow_flake = snowflake_0;
+  snowflakeNum0.pos_x = 23;
+  snowflakeNum0.pos_y = 0;
+  snowflakeNum0.size_x = 4;
+  snowflakeNum0.size_y = 7;
+  snowflakeNum0.red = 100;
+  snowflakeNum0.green = 0;
+  snowflakeNum0.blue = 20;
+  snowflakeNum0.interval = random(200, 1000);
+  snowflakeNum0.glowInterval = 15;
+  snowflakeNum0.moveInterval = random(70);
 }
 
 unsigned long snowfallInterval = 40;
@@ -245,14 +300,8 @@ void printSnowflakeRotatedInternal(const Snowflake flake, float angle) {
   float angle_rad = angle * M_PI / 180.0;
   float cosTau = cos(angle_rad);
   float sinTau = sin(angle_rad);
-  //int8_t rot_x = flake.pos_x + flake.size_x / 2;
-  //int8_t rot_y = flake.pos_y + flake.size_y / 2;
-  //float rot_x = (float)flake.pos_x + (float)flake.size_x / (float)2.0;
-  //float rot_y = (float)flake.pos_y + (float)flake.size_y / (float)2.0;
   float rot_x = flake.pos_x + flake.size_x / 2;
   float rot_y = flake.pos_y + flake.size_y / 2;
-  //int8_t rot_x = 15;
-  //int8_t rot_y = 10;
   for (uint8_t y = 0; y < flake.size_y; ++y)
     for (uint8_t x = 0; x < flake.size_x; ++x) {
       uint8_t color = flake.snow_flake[x + flake.size_x * (flake.size_y - 1 - y)];
@@ -295,6 +344,153 @@ void glowSnowflake(Snowflake flake) {
           break;
       }
       ++y;
+    }
+  }
+}
+
+void printMarioInternal(int8_t pos_x, int8_t pos_y) {
+  for (uint8_t y = 0; y < 16; ++y)
+    for (uint8_t x = 0; x < 16; ++x) {
+      uint8_t color = mario[x + 16 * (15 - y)];
+      switch (color) {
+        case 1:
+          drawPixel(pos_x + x, pos_y + y, 255, 0, 0);
+          break;
+        case 2:
+          drawPixel(pos_x + x, pos_y + y, 255, 255, 255);
+          break;
+        case 3:
+          drawPixel(pos_x + x, pos_y + y, 0, 125, 242);
+          break;
+        case 4:
+          drawPixel(pos_x + x, pos_y + y, 186, 158, 111);
+          break;
+        case 5:
+          //drawPixel(pos_x + x, pos_y + y, 76, 0, 49);
+          //drawPixel(pos_x + x, pos_y + y, 0, 0, 40);
+          break;
+        case 0:
+          //drawPixel(pos_x + x, pos_y + y, 76, 0, 49);
+          drawPixel(pos_x + x, pos_y + y, 0, 0, 0);
+          break;
+        default:
+          break;
+      }
+    }
+}
+
+void printMarioRotatedInternal(float angle, int8_t pos_x, int8_t pos_y) {
+  float angle_rad = angle * M_PI / 180.0;
+  float cosTau = cos(angle_rad);
+  float sinTau = sin(angle_rad);
+  //float rot_x = (float)pos_x + (float)16 / (float)2;
+  //float rot_y = (float)pos_y + (float)16 / (float)2;
+  float rot_x = pos_x + 16 / 2;
+  float rot_y = pos_y + 16 / 2;
+  for (uint8_t y = 0; y < 16; ++y)
+    for (uint8_t x = 0; x < 16; ++x) {
+      uint8_t color = mario[x + 16 * (16 - 1 - y)];
+      switch (color) {
+        case 1:
+          drawRotatedPixel(pos_x + x, pos_y + y, rot_x, rot_y, cosTau, sinTau, 255, 0, 0);
+          break;
+        case 2:
+          drawRotatedPixel(pos_x + x, pos_y + y, rot_x, rot_y, cosTau, sinTau, 255, 255, 255);
+          break;
+        case 3:
+          drawRotatedPixel(pos_x + x, pos_y + y, rot_x, rot_y, cosTau, sinTau, 0, 125, 242);
+          break;
+        case 4:
+          drawRotatedPixel(pos_x + x, pos_y + y, rot_x, rot_y, cosTau, sinTau, 186, 158, 111);
+          break;
+        case 5:
+          break;
+        case 0:
+          drawRotatedPixel(pos_x + x, pos_y + y, rot_x, rot_y, cosTau, sinTau, 0, 0, 0);
+          break;
+        default:
+          break;
+      }
+    }
+}
+
+void printSwordInternal(int8_t pos_x, int8_t pos_y) {
+  for (uint8_t y = 0; y < 16; ++y)
+    for (uint8_t x = 0; x < 16; ++x) {
+      uint8_t color = sword[x + 16 * (15 - y)];
+      switch (color) {
+        case 1:
+          drawPixel(pos_x + x, pos_y + y, 212, 191, 2);
+          break;
+        case 2:
+          drawPixel(pos_x + x, pos_y + y, 247, 227, 42);
+          break;
+        case 3:
+          drawPixel(pos_x + x, pos_y + y, 17, 118, 247);
+          break;
+        case 4:
+          drawPixel(pos_x + x, pos_y + y, 158, 58, 24);
+          break;
+        case 5:
+          drawPixel(pos_x + x, pos_y + y, 173, 48, 36);
+          break;
+        case 6:
+          drawPixel(pos_x + x, pos_y + y, 178, 179, 177);
+          break;
+        case 7:
+          drawPixel(pos_x + x, pos_y + y, 57, 157, 207);
+          break;
+        default:
+          break;
+      }
+    }
+}
+
+void printSwordRotatedInternal(float angle, int8_t pos_x, int8_t pos_y, float rot_x, float rot_y) {
+  float angle_rad = angle * M_PI / 180.0;
+  float cosTau = cos(angle_rad);
+  float sinTau = sin(angle_rad);
+  for (uint8_t y = 0; y < 16; ++y)
+    for (uint8_t x = 0; x < 16; ++x) {
+      uint8_t color = sword[x + 16 * (16 - 1 - y)];
+      switch (color) {
+        case 1:
+          drawRotatedPixel(pos_x + x, pos_y + y, rot_x, rot_y, cosTau, sinTau, 212, 191, 2);
+          break;
+        case 2:
+          drawRotatedPixel(pos_x + x, pos_y + y, rot_x, rot_y, cosTau, sinTau, 247, 227, 42);
+          break;
+        case 3:
+          drawRotatedPixel(pos_x + x, pos_y + y, rot_x, rot_y, cosTau, sinTau, 17, 118, 247);
+          break;
+        case 4:
+          drawRotatedPixel(pos_x + x, pos_y + y, rot_x, rot_y, cosTau, sinTau, 158, 58, 24);
+          break;
+        case 5:
+          drawRotatedPixel(pos_x + x, pos_y + y, rot_x, rot_y, cosTau, sinTau, 173, 48, 36);
+          break;
+        case 6:
+          drawRotatedPixel(pos_x + x, pos_y + y, rot_x, rot_y, cosTau, sinTau, 178, 179, 177);
+          break;
+        case 7:
+          drawRotatedPixel(pos_x + x, pos_y + y, rot_x, rot_y, cosTau, sinTau, 57, 157, 207);
+          break;
+        default:
+          break;
+      }
+    }
+}
+
+void printSchaedelInternal(uint8_t n, int8_t x, int8_t y, uint8_t red, uint8_t green, uint8_t blue) {
+  for (int letter_y = 0; letter_y < 12; ++letter_y) {
+    for (int letter_x = 0; letter_x < 13; ++letter_x) {
+      if (letter_x < 8) {
+        if (bitRead(schaedel[n][(23 - letter_y * 2 - 1)], 7 - letter_x))
+          drawPixel(x + letter_x, y + letter_y, red, green, blue);
+      } else {
+        if (bitRead(schaedel[n][(23 - letter_y * 2)], 15 - letter_x))
+          drawPixel(x + letter_x, y + letter_y, red, green, blue);
+      }
     }
   }
 }
@@ -371,6 +567,48 @@ void printSnowmanInternal(int8_t pos_x, int8_t pos_y) {
           break;
         case 6:
           drawPixel(pos_x + x, pos_y + y, 0, 0, 0);
+          break;
+        default:
+          break;
+      }
+    }
+}
+
+void printChristmasTreeInternal(int8_t pos_x, int8_t pos_y, bool first) {
+  for (uint8_t y = 0; y < 16; ++y)
+    for (uint8_t x = 0; x < 15; ++x) {
+      uint8_t color = christmastree[x + 15 * (15 - y)];
+      switch (color) {
+        case 1:
+          drawPixel(pos_x + x, pos_y + y, 29, 184, 0);
+          break;
+        case 2:
+          drawPixel(pos_x + x, pos_y + y, 0, 0, 0);
+          //drawPixel(pos_x + x, pos_y + y, 15, 84, 51);
+          break;
+        case 3:
+          drawPixel(pos_x + x, pos_y + y, 22, 135, 73);
+          break;
+        case 4:
+          if (first)
+            drawPixel(pos_x + x, pos_y + y, 255, 255, 0);
+          else
+            drawPixel(pos_x + x, pos_y + y, 255, 0, 0);
+          break;
+        case 5:
+          if (first)
+            drawPixel(pos_x + x, pos_y + y, 0, 0, 255);
+          else
+            drawPixel(pos_x + x, pos_y + y, 255, 255, 0);
+          break;
+        case 6:
+          if (first)
+            drawPixel(pos_x + x, pos_y + y, 255, 0, 0);
+          else
+            drawPixel(pos_x + x, pos_y + y, 0, 0, 255);
+          break;
+        case 7:
+          drawPixel(pos_x + x, pos_y + y, 173, 116, 17);
           break;
         default:
           break;

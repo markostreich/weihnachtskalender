@@ -74,11 +74,14 @@ uint8_t fire_4[30] {
 
 Candle candle_1;
 Candle candle_2;
+Candle candle_3;
 
 void initCandles() {
   candle_1.pos_x = 25;
-  candle_1.state = 1;
-  candle_2.pos_x = 16;
+  candle_1.state = 2;
+  candle_2.pos_x = 17;
+  candle_2.state = 1;
+  candle_3.pos_x = 9;
 }
 
 void printFireInternal(int8_t fire[], int8_t pos_x, int8_t pos_y) {
